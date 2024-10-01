@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Store Demo</string>
+    <string name="please_confirm">Please confirm</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="action">action = </string>
+    <string name="transaction">transaction.</string>
+    <string name="execute">EXECUTE</string>
+</resources>
