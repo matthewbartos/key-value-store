@@ -68,8 +68,4 @@ class InMemoryKeyValueStoreImpl : KeyValueStore {
             stack.lastOrNull()?.let { stack.remove(it) }
         } ?: error("No transaction to rollback")
     }
-
-    // fun cleanup() {
-    //      TODO: Maybe it's a good idea to clean up TransactionStackMap periodically?
-    // }
 }

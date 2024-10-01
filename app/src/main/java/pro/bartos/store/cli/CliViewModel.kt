@@ -2,6 +2,7 @@ package pro.bartos.store.cli
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -34,7 +35,9 @@ class CliViewModel(
     private val currentLoadedState: CliState.Loaded?
         get() = _state.value as? CliState.Loaded
 
-    fun handleIntent(intent: CliIntent) {
+    // Skipping Intent -> Action mapping
+    // It's 1:1 mapping, avoiding unnecessary complexity
+    fun handleIntent(intent: CliIntent) = viewModelScope.launch(Dispatchers.IO) {
         when (intent) {
             is CliIntent.ChangeInput -> currentLoadedState?.copy(input = intent.input)?.let { _state.value = it }
 
@@ -86,7 +89,7 @@ class CliViewModel(
                     appendLog(logMessage, listOf(DOUBLE_VALUE_ERROR))
                     return@launch
                 }
-                keyValueStore.set(key to value)
+                keyValueStore.set(key = key, value = value)
                 appendLog(logMessage)
             }
 
@@ -150,6 +153,7 @@ class CliViewModel(
             █ R █ E █ A █ D █ Y █
             ███████████████
             """.trimIndent()
+
         private const val INSTRUCTIONS_MESSAGE = "[ Select a command and provide a value ] "
         private const val SINGLE_VALUE_ERROR = "[!] Please provide exactly ONE value"
         private const val DOUBLE_VALUE_ERROR = "[!] Please provide exactly TWO values"

@@ -32,17 +32,17 @@ class KeyValueStoreTest {
 
     @Test
     fun `SET and GET return correct value`() = runTest {
-        store.set("0" to "A")
+        store.set("0", "A")
         assertEquals("A", store.get(key = "0"))
     }
 
     @Test
     fun `A single transaction is commited correctly`() = runTest {
-        store.set("0" to "A")
+        store.set("0", "A")
         assertEquals("A", store.get(key = "0"))
 
         store.beginTransaction()
-        store.set("0" to "B")
+        store.set("0", "B")
         assertEquals("B", store.get(key = "0"))
         store.commitTransaction()
 
@@ -51,11 +51,11 @@ class KeyValueStoreTest {
 
     @Test
     fun `A single transaction is rolled back correctly`() = runTest {
-        store.set("0" to "A")
+        store.set("0", "A")
         assertEquals("A", store.get(key = "0"))
 
         store.beginTransaction()
-        store.set("0" to "B")
+        store.set("0", "B")
         assertEquals("B", store.get(key = "0"))
         store.rollbackTransaction()
 
@@ -68,17 +68,17 @@ class KeyValueStoreTest {
 
     @Test
     fun `Concurrent transactions commit and rollback works correctly`() = runTest {
-        store.set("foo" to "123")
-        store.set("bar" to "456")
+        store.set("foo", "123")
+        store.set("bar", "456")
 
         (1..100).forEach { i ->
             launch(Dispatchers.Default) {
                 store.beginTransaction()
-                /**/ store.set("foo" to "456$i")
+                /**/ store.set("foo", "456$i")
 
                 /**/ store.beginTransaction()
                 /**//**/ assertEquals("456$i", store.get(key = "foo"))
-                /**//**/ store.set("foo" to "789$i")
+                /**//**/ store.set("foo", "789$i")
                 /**//**/ assertEquals("789$i", store.get(key = "foo"))
                 /**/ store.rollbackTransaction()
 
@@ -94,7 +94,7 @@ class KeyValueStoreTest {
 
     @Test
     fun `Concurrent reads and writes work`() = runTest {
-        store.set("foo" to "bar")
+        store.set("foo", "bar")
         val coroutineCount = 100
         val results = mutableListOf<String?>()
         val coroutines = mutableListOf<Deferred<Any>>()
@@ -103,7 +103,7 @@ class KeyValueStoreTest {
             coroutines.add(
                 async(Dispatchers.Default) {
                     if (i % 2 == 0) {
-                        store.set("foo" to "new_$i")
+                        store.set("foo", "new_$i")
                     } else {
                         results.add(store.get("foo"))
                     }
@@ -111,42 +111,41 @@ class KeyValueStoreTest {
             )
         }
         coroutines.awaitAll()
-        assertTrue(results.contains(null).not())
-        assertTrue(results.size == coroutineCount / 2, "Result size is ${results.size}, should be $coroutineCount")
+        assertTrue(results.contains(null).not()) // sometimes I was getting null reads while doing concurrent writes and reads
+        assertTrue(results.size == coroutineCount / 2, "Result size is ${results.size}, should be ${coroutineCount / 2}")
     }
 
     @Test
     fun `Concurrent transactions commits may override each other`() = runTest {
         val results = mutableListOf<String?>()
         val coroutines = mutableListOf<Deferred<Boolean>>()
-        store.set("foo" to "123")
+        store.set("foo", "123")
 
         (1..100).forEach { i ->
             coroutines.add(
                 async(Dispatchers.Default) {
                     store.beginTransaction()
-                    /**/ store.set("foo" to "new_$i")
+                    /**/ store.set("foo", "new_$i")
                     store.commitTransaction()
                     results.add(store.get("foo"))
                 }
             )
         }
         coroutines.awaitAll()
-        println(results)
-        assertTrue(results.size > 1)
+        assertTrue(results.distinct().size > 1)
     }
     //endregion
 
     // region Tests from the official task description
     @Test
     fun `Set and get a value`() = runTest {
-        store.set("foo" to "123")
+        store.set("foo", "123")
         assertEquals("123", store.get(key = "foo"))
     }
 
     @Test
     fun `Delete a value`() = runTest {
-        store.set("foo" to "123")
+        store.set("foo", "123")
         store.delete(key = "foo")
         assertEquals(null, store.get(key = "foo"))
     }
@@ -162,9 +161,9 @@ class KeyValueStoreTest {
      */
     @Test
     fun `Count the number of occurrences of a value`() = runTest {
-        store.set("foo" to "123")
-        store.set("bar" to "456")
-        store.set("baz" to "123")
+        store.set("foo", "123")
+        store.set("bar", "456")
+        store.set("baz", "123")
 
         assertEquals(2, store.count("123"))
         assertEquals(1, store.count("456"))
@@ -189,11 +188,11 @@ class KeyValueStoreTest {
      */
     @Test
     fun `Commit a transaction`() = runTest {
-        store.set("bar" to "123")
+        store.set("bar", "123")
         assertEquals("123", store.get(key = "bar"))
 
         store.beginTransaction()
-        /**/ store.set("foo" to "456")
+        /**/ store.set("foo", "456")
         /**/ assertEquals("123", store.get(key = "bar"))
         /**/ store.delete("bar")
         store.commitTransaction()
@@ -225,13 +224,14 @@ class KeyValueStoreTest {
      */
     @Test
     fun `Rollback a transaction`() = runTest {
-        store.set("foo" to "123")
-        store.set("bar" to "abc")
+        store.set("foo", "123")
+        store.set("bar", "abc")
 
         store.beginTransaction()
-        /**/ store.set("foo" to "456")
+        /**/ store.set("foo", "456")
         /**/ assertEquals("456", store.get(key = "foo"))
-        /**/ store.set("bar" to "def")
+        /**/ store.set("bar", "def")
+        /**/ assertEquals("def", store.get(key = "bar"))
         store.rollbackTransaction()
 
         assertEquals("123", store.get(key = "foo"))
@@ -267,16 +267,16 @@ class KeyValueStoreTest {
      */
     @Test
     fun `Nested transactions`() = runTest {
-        store.set("foo" to "123")
-        store.set("bar" to "456")
+        store.set("foo", "123")
+        store.set("bar", "456")
 
         store.beginTransaction()
-        /**/ store.set("foo" to "456")
+        /**/ store.set("foo", "456")
 
         /**/ store.beginTransaction()
         /**//**/ assertEquals(2, store.count(value = "456"))
         /**//**/ assertEquals("456", store.get(key = "foo"))
-        /**//**/ store.set("foo" to "789")
+        /**//**/ store.set("foo", "789")
         /**//**/ assertEquals("789", store.get(key = "foo"))
         /**/ store.rollbackTransaction()
 

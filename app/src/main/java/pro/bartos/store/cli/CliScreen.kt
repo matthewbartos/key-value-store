@@ -62,6 +62,7 @@ fun MainScreen(
 ) {
     val listState = rememberLazyListState()
     if (state !is CliState.Loaded) {
+        // outside of task scope, other states like Empty, Error, Loading should be provided
         TODO("Implement other states")
     }
 
@@ -86,7 +87,7 @@ fun MainScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.Black)
+            .background(color = Color.Black) // primary / secondary theme color
             .padding(15.dp),
     ) {
         LazyColumn(
@@ -107,7 +108,7 @@ fun MainScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp)) // save 10.dp to theme
 
         Spacer(modifier = Modifier
             .height(2.dp)
