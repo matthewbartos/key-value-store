@@ -48,6 +48,8 @@ import pro.bartos.store.cli.CliOperation.ValueOperation.Count
 import pro.bartos.store.cli.CliOperation.ValueOperation.Delete
 import pro.bartos.store.cli.CliOperation.ValueOperation.Get
 import pro.bartos.store.cli.CliOperation.ValueOperation.Set
+import pro.bartos.store.ui.CommonComposableValues.spacer10
+import pro.bartos.store.ui.CommonComposableValues.spacer15
 import pro.bartos.store.ui.OperationButton
 import pro.bartos.store.ui.OperationTitle
 import pro.bartos.store.ui.TerminalText
@@ -108,7 +110,7 @@ fun MainScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp)) // save 10.dp to theme
+        Spacer(modifier = Modifier.height(spacer10))
 
         Spacer(modifier = Modifier
             .height(2.dp)
@@ -116,7 +118,7 @@ fun MainScreen(
             .background(Color.White)
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(spacer10))
 
         FlowRow(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
             OperationTitle(stringResource(R.string.action))
@@ -129,7 +131,7 @@ fun MainScreen(
             }
         }
 
-        Spacer(Modifier.height(15.dp))
+        Spacer(Modifier.height(spacer15))
 
         FlowRow(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
             OperationTitle(stringResource(R.string.transaction))
@@ -141,7 +143,7 @@ fun MainScreen(
             }
         }
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(spacer10))
 
         Row(
             horizontalArrangement = Arrangement.SpaceAround,
